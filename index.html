@@ -266,6 +266,8 @@ localStorage.setItem('upgradeCost', upgradeCost);
 localStorage.setItem('coinsPerHour', coinsPerHour);
 localStorage.setItem('hourlyUpgradeCost', hourlyUpgradeCost);
 localStorage.setItem('hourlyIncrement', hourlyIncrement);
+localStorage.setItem('hourlyUpgradeCost2', hourlyUpgradeCost);
+localStorage.setItem('hourlyIncrement2', hourlyIncrement);
 }
 function loadProgress() {
 if (localStorage.getItem('counter')) {
@@ -275,9 +277,13 @@ upgradeCost = parseFloat(localStorage.getItem('upgradeCost'));
 coinsPerHour = parseFloat(localStorage.getItem('coinsPerHour'));
 hourlyUpgradeCost = parseFloat(localStorage.getItem('hourlyUpgradeCost'));
 hourlyIncrement = parseFloat(localStorage.getItem('hourlyIncrement'));
+hourlyUpgradeCost2 = parseFloat(localStorage.getItem('hourlyUpgradeCost2'));
+hourlyIncrement2 = parseFloat(localStorage.getItem('hourlyIncrement2'));
 document.getElementById('counter').innerText = Math.round(counter);
 document.getElementById('upgrade-cost').innerText = Math.round(upgradeCost);
 document.getElementById('hourly-upgrade-cost').innerText = Math.round(hourlyUpgradeCost);
+document.getElementById('upgrade-cost2').innerText = Math.round(upgradeCost2);
+document.getElementById('hourly-upgrade-cost2').innerText = Math.round(hourlyUpgradeCost2);
 updateInfoBoxes();
 }
 }
@@ -323,7 +329,9 @@ setInterval(updateCoinsPerHour, 1000);
 <button onclick="buyUpgrade()">Купить улучшение (Цена: <span id="upgrade-cost">10</span>)</button>
 </div>
 <div class="shop-item">
-<button onclick="buyHourlyUpgrade()">Увеличить прибыль в час (Цена: <span id="hourly-upgrade-cost">50</span>)</button>
+<button onclick="buyHourlyUpgrade()">Увеличить прибыль в час 1 (Цена: <span id="hourly-upgrade-cost">50</span>)</button>
+</div>
+<button onclick="buyHourlyUpgrade2()">Увеличить прибыль в час 2(Цена: <span id="hourly-upgrade-cost">50</span>)</button>
 </div>
 <button class="close-shop" onclick="closeShop()">Закрыть</button>
 </div>
