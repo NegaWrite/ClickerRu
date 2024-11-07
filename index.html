@@ -19,10 +19,6 @@ background-color: #333;
 color: white;
 margin: 0;
 padding: 0;
-overflow: hidden;
-}
-canvas {
-display: block;
 }
 .click-button img, .shop-button img {
 margin-right: 10px;
@@ -167,8 +163,6 @@ font-size: 16px;
 width: 120px;
 }
 }
-#clicker { position: absolute; top: 10px; right: 10px; padding: 10px; background-color: #fff; border: 1px solid #000; cursor: pointer; user-select: none;
-  
 </style>
 <script>
 let counter = 0;
@@ -304,48 +298,6 @@ window.onload = () => {
 loadGame();
 setInterval(updateCoinsPerHour, 1000);
 };
-</script>
-<canvas id="canvas"></canvas>
-<script>
-
-  <script src="https://cdn.jsdelivr.net/npm/perlin-noise@1.0.1/perlin-noise.min.js"></script>
-  <script>
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    function draw() {
-      let imageData = ctx.createImageData(canvas.width, canvas.height);
-      for (let y = 0; y < canvas.height; y++) {
-        for (let x = 0; x < canvas.width; x++) {
-          let value = (noise.perlin2((x + time) * 0.01, (y + time) * 0.01) + 1) * 128;
-          let index = (x + y * canvas.width) * 4;
-          imageData.data[index] = value;        // Red
-          imageData.data[index + 1] = value;    // Green
-          imageData.data[index + 2] = value;    // Blue
-          imageData.data[index + 3] = 255;      // Alpha
-        }
-      }
-      ctx.putImageData(imageData, 0, 0);
-    }
-
-    let time = 0;
-    function animate() {
-      time += 1;
-      draw();
-      requestAnimationFrame(animate);
-    }
-
-    animate();
-
-    // Clicker functionality
-    const clicker = document.getElementById('clicker');
-    let clickCount = 0;
-    clicker.addEventListener('click', () => {
-      clickCount++;
-      clicker.textContent = `Click count: ${clickCount}`;
-    });
 </script>
 <div class="loading-screen" id="loading-screen">
 Загрузка...
