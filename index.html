@@ -6,6 +6,8 @@
 <title>Кликер</title>
 <link rel="stylesheet" href="styles.css">
 <style>
+
+
 body {
 display: flex;
 flex-direction: column;
@@ -17,6 +19,10 @@ background-color: #333;
 color: white;
 margin: 0;
 padding: 0;
+overflow: hidden;
+}
+canvas {
+display: block;
 }
 .click-button img, .shop-button img {
 margin-right: 10px;
@@ -297,10 +303,38 @@ window.onload = () => {
 loadGame();
 setInterval(updateCoinsPerHour, 1000);
 };
-  
 </script>
-</head>
-<body>
+<canvas id="canvas"></canvas>
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+function perlinNoise(x, y) {
+return (Math.sin(x * 0.1) + Math.sin(y * 0.1)) * 0.5;
+}
+function draw() {
+let imageData = ctx.createImageData(canvas.width, canvas.height);
+for (let y = 0; y < canvas.height; y++) {
+for (let x = 0; x < canvas.width; x++) {
+let value = (perlinNoise(x + time * 0.1, y + time * 0.1) + 1) * 128;
+let index = (x + y * canvas.width) * 4;
+imageData.data[index] = value;        // Red
+imageData.data[index + 1] = value;    // Green
+imageData.data[index + 2] = value;    // Blue
+imageData.data[index + 3] = 255;      // Alpha
+}
+}
+ctx.putImageData(imageData, 0, 0);
+}
+let time = 0;
+function animate() {
+time += 1;
+draw();
+requestAnimationFrame(animate);
+}
+animate();
+</script>
 <div class="loading-screen" id="loading-screen">
 Загрузка...
 <div class="loading-bar">
