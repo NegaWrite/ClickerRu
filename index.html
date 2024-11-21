@@ -197,18 +197,65 @@
     </div>
     <button class="close-shop" onclick="closeShop()">Закрыть</button>
   </div>
-  <div class="music-controls">
-    <audio id="background-music" controls>
-      <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID1" type="audio/mpeg">
-      <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID2" type="audio/mpeg">
-      <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID3" type="audio/mpeg">
-      <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID4" type="audio/mpeg">
-      <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID5" type="audio/mpeg">
-      <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID6" type="audio/mpeg">
-      <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID7" type="audio/mpeg">
-      Ваш браузер не поддерживает элемент audio.
-    </audio>
-  </div>
+ <div class="music-controls">
+  <div class="music-title" id="music-title">Музыка 1</div>
+  <audio id="background-music" controls>
+    <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID1" type="audio/mpeg" data-title="Музыка 1">
+    <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID2" type="audio/mpeg" data-title="Музыка 2">
+    <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID3" type="audio/mpeg" data-title="Музыка 3">
+    <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID4" type="audio/mpeg" data-title="Музыка 4">
+    <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID5" type="audio/mpeg" data-title="Музыка 5">
+    <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID6" type="audio/mpeg" data-title="Музыка 6">
+    <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID7" type="audio/mpeg" data-title="Музыка 7">
+    Ваш браузер не поддерживает элемент audio.
+  </audio>
+  <input type="range" id="music-progress" value="0" max="100">
+  <div id="music-time">0:00 / 0:00</div>
+</div>
+
+<script>
+  const audioElement = document.getElementById('background-music');
+  const progressBar = document.getElementById('music-progress');
+  const musicTitle = document.getElementById('music-title');
+  const musicTime = document.getElementById('music-time');
+
+  audioElement.addEventListener('loadedmetadata', () => {
+    progressBar.max = audioElement.duration;
+    updateMusicTime();
+  });
+
+  audioElement.addEventListener('timeupdate', () => {
+    progressBar.value = audioElement.currentTime;
+    updateMusicTime();
+  });
+
+  progressBar.addEventListener('input', () => {
+    audioElement.currentTime = progressBar.value;
+  });
+
+  function updateMusicTime() {
+    const currentTime = formatTime(audioElement.currentTime);
+    const duration = formatTime(audioElement.duration);
+    musicTime.textContent = `${currentTime} / ${duration}`;
+  }
+
+  function formatTime(time) {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60).toString().padStart(2, '0');
+    return `${minutes}:${seconds}`;
+  }
+
+  audioElement.addEventListener('play', updateMusicTitle);
+  audioElement.addEventListener('ended', updateMusicTitle);
+
+  function updateMusicTitle() {
+    const currentSource = audioElement.querySelector('source[src="' + audioElement.currentSrc + '"]');
+    if (currentSource) {
+      musicTitle.textContent = currentSource.getAttribute('data-title');
+    }
+  }
+</script>
+
   <div class="section">
     <button class="shop-button" onclick="happyBirthday()">С ДР</button>
   </div>
