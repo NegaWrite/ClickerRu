@@ -1,337 +1,371 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Кликер</title>
-<link rel="stylesheet" href="styles.css">
-<style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Кликер</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      background-color: #333;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+    .section {
+      margin: 10px;
+      text-align: center;
+    }
+    .counter {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+    .click-button {
+      padding: 22.5px 45px; /* увеличено на 1.5 раза */
+      font-size: 27px; /* увеличено на 1.5 раза */
+      border-radius: 75px;
+      width: 300px; /* увеличено на 1.5 раза */
+      height: 225px; /* увеличено на 1.5 раза */
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .click-button:hover {
+      transform: scale(1.1);
+    }
+    .shop-button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 15px;
+      background-color: #FF9800;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+    .shop-button:hover {
+      background-color: #FB8C00;
+      transform: scale(1.1);
+    }
+    .shop-item {
+      margin-top: 10px;
+    }
+    .shop-item button {
+      border-radius: 5px;
+      background-color: #2196F3;
+      color: white;
+      padding: 10px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .shop-item button:hover {
+      background-color: #0b7dda;
+    }
+    .shop {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+    .shop h2 {
+      margin-bottom: 20px;
+    }
+    .close-shop {
+      margin-top: 30px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 10px;
+      background-color: #e00000;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+    .info-box {
+      font-size: 20px;
+      margin: 10px;
+      padding: 10px;
+      border: 2px solid #fff;
+      border-radius: 10px;
+      width: 150px;
+      text-align: center;
+    }
+    .loading-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      color: white;
+      font-size: 24px;
+    }
+    .loading-bar {
+      width: 80%;
+      height: 30px;
+      background-color: #555;
+      border-radius: 15px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+    .loading-progress {
+      height: 100%;
+      background-color: #4CAF50;
+      width: 0;
+      transition: width 0.5s;
+    }
+    .notification {
+      position: fixed;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #FF9800;
+      color: white;
+      padding: 15px 30px;
+      border-radius: 5px;
+      transition: top 0.5s;
+    }
+    .music-controls {
+      margin-top: 20px;
+    }
+    audio {
+      width: 100%;
+    }
+    @media (max-width: 600px) {
+      .counter {
+        font-size: 24px;
+      }
+      .shop-button {
+        padding: 8px 16px;
+        font-size: 14px;
+        border-radius: 8px;
+      }
+      .info-box {
+        font-size: 16px;
+        width: 120px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-screen" id="loading-screen">Загрузка...
+    <div class="loading-bar">
+      <div class="loading-progress" id="loading-progress"></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="counter" id="counter">0</div>
+  </div>
+  <div class="section">
+    <button class="click-button" onclick="incrementCounter()">Кликни меня!</button>
+    <audio id="click-sound" src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID"></audio>
+  </div>
+  <div class="section">
+    <button class="shop-button" onclick="openShop()">Магазин</button>
+  </div>
+  <div class="section">
+    <div class="info-box" id="points-per-click">Монет за клик: 1</div>
+    <div class="info-box" id="coins-per-hour">Прибыль в час: 0</div>
+    <div class="info-box" id="level">Уровень: Бронза</div>
+  </div>
+  <div class="shop" id="shop">
+    <h2>Магазин</h2>
+    <div class="shop-item">
+      <button onclick="buyUpgrade()">Купить улучшение (Цена: <span id="upgrade-cost">10</span>)</button>
+    </div>
+    <div class="shop-item">
+      <button onclick="buyHourlyUpgrade()">Увеличить прибыль в час (Цена: <span id="hourly-upgrade-cost">50</span>)</button>
+    </div>
+    <button class="close-shop" onclick="closeShop()">Закрыть</button>
+  </div>
+  <div class="music-controls">
+    <audio id="background-music" controls>
+      <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID1" type="audio/mpeg">
+      <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID2" type="audio/mpeg">
+      <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID3" type="audio/mpeg">
+      <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID4" type="audio/mpeg">
+      <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID5" type="audio/mpeg">
+      <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID6" type="audio/mpeg">
+      <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID7" type="audio/mpeg">
+      Ваш браузер не поддерживает элемент audio.
+    </audio>
+  </div>
+  <div class="section">
+    <button class="shop-button" onclick="happyBirthday()">С ДР</button>
+  </div>
+  <div class="notification" id="notification">Недостаточно кликов для покупки улучшения!</div>
+  <script>
+  let counter = 0;
+  let pointsPerClick = 1;
+  let upgradeCost = 10;
+  let coinsPerHour = 0;
+  let hourlyUpgradeCost = 50;
+  let hourlyIncrement = 180;
+  let lastClickTime = 0;
+  let clickInterval = 100; // 0.1 second or 10 cps
+  let levels = [
+    { name: "Бронза", min: 0, max: 4999 },
+    { name: "Серебро", min: 5000, max: 24999 },
+    { name: "Золото", min: 25000, max: 99999 },
+    { name: "Платина", min: 100000, max: 999999 },
+    { name: "Алмаз", min: 1000000, max: 1999999 },
+    { name: "Эпик", min: 2000000, max: 9999999 },
+    { name: "Легенда", min: 10000000, max: 49999999 },
+    { name: "Мастер", min: 50000000, max: 99999999 },
+    { name: "Грандмастер", min: 100000000, max: 999999999 },
+    { name: "Лорд", min: 1000000000, max: Infinity }
+  ];
 
+  function incrementCounter() {
+    let currentTime = new Date().getTime();
+    if (currentTime - lastClickTime >= clickInterval) {
+      counter += pointsPerClick;
+      document.getElementById('counter').innerText = Math.round(counter);
+      updateInfoBoxes();
+      saveProgress();
+      lastClickTime = currentTime;
+      playClickSound();
+    } else {
+      showNotification("Слишком быстро кликаете!");
+    }
+  }
 
-body {
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-height: 100vh;
-font-family: Arial, sans-serif;
-background-color: #333;
-color: white;
-margin: 0;
-padding: 0;
-}
-.click-button img, .shop-button img {
-margin-right: 10px;
-}
-.section {
-margin: 10px;
-text-align: center;
-}
-.counter {
-font-size: 36px;
-margin-bottom: 20px;
-}
-.click-button {
-padding: 15px 30px;
-font-size: 18px;
-border-radius: 75px;
-width: 200px;
-height: 150px;
-background-color: #4CAF50;
-color: white;
-border: none;
-cursor: pointer;
-transition: transform 0.2s;
-}
-.click-button:hover {
-transform: scale(1.1);
-}
-.shop-button {
-padding: 10px 20px;
-font-size: 16px;
-border-radius: 15px;
-background-color: #FB8C00;
-color: white;
-border: none;
-cursor: pointer;
-transition: background-color 0.3s, transform 0.2s;
-}
-.shop-button:hover {
-background-color: #FB8C00;
-transform: scale(1.1);
-}
-.shop-item {
-margin-top: 10px;
-}
-.shop-item button {
-border-radius: 5px;
-background-color: #2196F3;
-color: white;
-padding: 10px;
-border: none;
-cursor: pointer;
-transition: background-color 0.2s;
-}
-.shop-item button:hover {
-background-color: #0b7dda;
-}
-.shop {
-display: none;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background-color: rgba(0, 0, 0, 0.8);
-}
-.shop h2 {
-margin-bottom: 20px;
-}
-.close-shop {
-margin-top: 30px;
-padding: 10px 20px;
-font-size: 16px;
-border-radius: 10px;
-background-color: #e00000;
-color: white;
-border: none;
-cursor: pointer;
-transition: background-color 0.3s, transform 0.2s;
-}
-.info-box {
-font-size: 20px;
-margin: 10px;
-padding: 10px;
-border: 2px solid #fff;
-border-radius: 10px;
-width: 150px;
-text-align: center;
-}
-.loading-screen {
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background-color: black;
-color: white;
-font-size: 24px;
-}
-.loading-bar {
-width: 80%;
-height: 30px;
-background-color: #555;
-border-radius: 15px;
-overflow: hidden;
-margin-top: 20px;
-}
-.loading-progress {
-height: 100%;
-background-color: #4CAF50;
-width: 0;
-transition: width 0.5s;
-}
-.notification {
-position: fixed;
-top: -100px;
-left: 50%;
-transform: translateX(-50%);
-background-color: #FF9800;
-color: white;
-padding: 15px 30px;
-border-radius: 5px;
-transition: top 0.5s;
-}
-@media (max-width: 600px) {
-.counter {
-font-size: 24px;
-}
-.shop-button {
-padding: 8px 16px;
-font-size: 14px;
-border-radius: 8px;
-}
-.info-box {
-font-size: 16px;
-width: 120px;
-}
-}
-</style>
-<script>
-let counter = 0;
-let pointsPerClick = 1;
-let upgradeCost = 10;
-let coinsPerHour = 0;
-let hourlyUpgradeCost = 50;
-let hourlyIncrement = 180;
-let lastClickTime = 0;
-let clickInterval = 100; // 0.1 second or 10 cps
-let levels = [
-{ name: "Бронза", min: 0, max: 4999 },
-{ name: "Серебро", min: 5000, max: 24999 },
-{ name: "Золото", min: 25000, max: 99999 },
-{ name: "Платина", min: 100000, max: 999999 },
-{ name: "Алмаз", min: 1000000, max: 1999999 },
-{ name: "Эпик", min: 2000000, max: 9999999 },
-{ name: "Легенда", min: 10000000, max: 49999999 },
-{ name: "Мастер", min: 50000000, max: 99999999 },
-{ name: "Грандмастер", min: 100000000, max: 999999999 },
-{ name: "Лорд", min: 1000000000, max: 1000000000000 },
-{ name: "Сигма", min: 1000000000000, max: Infinity }
-];
-function incrementCounter() {
-let currentTime = new Date().getTime();
-if (currentTime - lastClickTime >= clickInterval) {
-counter += pointsPerClick;
-document.getElementById('counter').innerText = Math.round(counter);
-updateInfoBoxes();
-saveProgress();
-lastClickTime = currentTime;
-} else {
-showNotification("Слишком быстро кликаете!");
-}
-}
-function buyUpgrade() {
-if (counter >= upgradeCost) {
-counter -= upgradeCost;
-pointsPerClick++;
-upgradeCost *= 1.4;
-document.getElementById('counter').innerText = Math.round(counter);
-document.getElementById('upgrade-cost').innerText = Math.round(upgradeCost);
-updateInfoBoxes();
-saveProgress();
-} else {
-showNotification("Недостаточно кликов для покупки улучшения!");
-}
-}
-function buyHourlyUpgrade() {
-if (counter >= hourlyUpgradeCost) {
-counter -= hourlyUpgradeCost;
-coinsPerHour += hourlyIncrement;
-hourlyIncrement *= 1.2;
-hourlyUpgradeCost *= 1.5;
-document.getElementById('counter').innerText = Math.round(counter);
-document.getElementById('hourly-upgrade-cost').innerText = Math.round(hourlyUpgradeCost);
-updateInfoBoxes();
-saveProgress();
-} else {
-showNotification("Недостаточно кликов для покупки улучшения!");
-}
-}
-function openShop() {
-document.getElementById('shop').style.display = 'flex';
-}
-function closeShop() {
-document.getElementById('shop').style.display = 'none';
-}
-function updateInfoBoxes() {
-document.getElementById('points-per-click').innerText = `Монет за клик: ${pointsPerClick}`;
-document.getElementById('coins-per-hour').innerText = `Прибыль в час: ${coinsPerHour}`;
-document.getElementById('level').innerText = `Уровень: ${getLevel()}`;
-}
-function loadGame() {
-let progress = 0;
-const loadingScreen = document.getElementById('loading-screen');
-const loadingProgress = document.getElementById('loading-progress');
-const interval = setInterval(() => {
-progress += 30;
-loadingProgress.style.width = `${progress}%`;
-if (progress >= 100) {
-clearInterval(interval);
-loadingScreen.style.display = 'none';
-}
-}, 500);
-loadProgress();
-}
-function updateCoinsPerHour() {
-counter += coinsPerHour / 3600;
-document.getElementById('counter').innerText = Math.round(counter);
-updateInfoBoxes();
-saveProgress();
-}
-function showNotification(message) {
-const notification = document.getElementById('notification');
-notification.innerText = message;
-notification.style.top = '20px';
-setTimeout(() => {
-notification.style.top = '-100px';
-}, 3000);
-}
-function saveProgress() {
-localStorage.setItem('counter', counter);
-localStorage.setItem('pointsPerClick', pointsPerClick);
-localStorage.setItem('upgradeCost', upgradeCost);
-localStorage.setItem('coinsPerHour', coinsPerHour);
-localStorage.setItem('hourlyUpgradeCost', hourlyUpgradeCost);
-localStorage.setItem('hourlyIncrement', hourlyIncrement);
-}
-function loadProgress() {
-if (localStorage.getItem('counter')) {
-counter = parseFloat(localStorage.getItem('counter'));
-pointsPerClick = parseFloat(localStorage.getItem('pointsPerClick'));
-upgradeCost = parseFloat(localStorage.getItem('upgradeCost'));
-coinsPerHour = parseFloat(localStorage.getItem('coinsPerHour'));
-hourlyUpgradeCost = parseFloat(localStorage.getItem('hourlyUpgradeCost'));
-hourlyIncrement = parseFloat(localStorage.getItem('hourlyIncrement'));
-document.getElementById('counter').innerText = Math.round(counter);
-document.getElementById('upgrade-cost').innerText = Math.round(upgradeCost);
-document.getElementById('hourly-upgrade-cost').innerText = Math.round(hourlyUpgradeCost);
-updateInfoBoxes();
-}
-}
-function getLevel() {
-for (let level of levels) {
-if (counter >= level.min && counter <= level.max) {
-return level.name;
-}
-}
-return "Бронза";
-}
-window.onload = () => {
-loadGame();
-setInterval(updateCoinsPerHour, 1000);
-};
+  function playClickSound() {
+    document.getElementById('click-sound').play();
+  }
+
+  function buyUpgrade() {
+    if (counter >= upgradeCost) {
+      counter -= upgradeCost;
+      pointsPerClick++;
+      upgradeCost *= 1.4;
+      document.getElementById('counter').innerText = Math.round(counter);
+      document.getElementById('upgrade-cost').innerText = Math.round(upgradeCost);
+      updateInfoBoxes();
+      saveProgress();
+    } else {
+      showNotification("Недостаточно кликов для покупки улучшения!");
+    }
+  }
+
+  function buyHourlyUpgrade() {
+    if (counter >= hourlyUpgradeCost) {
+      counter -= hourlyUpgradeCost;
+      coinsPerHour += hourlyIncrement;
+      hourlyIncrement *= 1.2;
+      hourlyUpgradeCost *= 1.5;
+      document.getElementById('counter').innerText = Math.round(counter);
+      document.getElementById('hourly-upgrade-cost').innerText = Math.round(hourlyUpgradeCost);
+      updateInfoBoxes();
+      saveProgress();
+    } else {
+      showNotification("Недостаточно кликов для покупки улучшения!");
+    }
+  }
+
+  function openShop() {
+    document.getElementById('shop').style.display = 'flex';
+  }
+
+  function closeShop() {
+    document.getElementById('shop').style.display = 'none';
+  }
+
+  function updateInfoBoxes() {
+    document.getElementById('points-per-click').innerText = `Монет за клик: ${pointsPerClick}`;
+    document.getElementById('coins-per-hour').innerText = `Прибыль в час: ${coinsPerHour}`;
+    document.getElementById('level').innerText = `Уровень: ${getLevel()}`;
+  }
+
+  function loadGame() {
+    let progress = 0;
+    const loadingScreen = document.getElementById('loading-screen');
+    const loadingProgress = document.getElementById('loading-progress');
+    const interval = setInterval(() => {
+      progress += 30;
+      loadingProgress.style.width = `${progress}%`;
+      if (progress >= 100) {
+        clearInterval(interval);
+        loadingScreen.style.display = 'none';
+      }
+    }, 500);
+    loadProgress();
+  }
+
+  function updateCoinsPerHour() {
+    counter += coinsPerHour / 3600;
+    document.getElementById('counter').innerText = Math.round(counter);
+    updateInfoBoxes();
+    saveProgress();
+  }
+
+  function showNotification(message) {
+    const notification = document.getElementById('notification');
+    notification.innerText = message;
+    notification.style.top = '20px';
+    setTimeout(() => {
+      notification.style.top = '-100px';
+    }, 3000);
+  }
+
+  function saveProgress() {
+    localStorage.setItem('counter', counter);
+    localStorage.setItem('pointsPerClick', pointsPerClick);
+    localStorage.setItem('upgradeCost', upgradeCost);
+    localStorage.setItem('coinsPerHour', coinsPerHour);
+    localStorage.setItem('hourlyUpgradeCost', hourlyUpgradeCost);
+    localStorage.setItem('hourlyIncrement', hourlyIncrement);
+  }
+
+  function loadProgress() {
+    if (localStorage.getItem('counter')) {
+      counter = parseFloat(localStorage.getItem('counter'));
+      pointsPerClick = parseFloat(localStorage.getItem('pointsPerClick'));
+      upgradeCost = parseFloat(localStorage.getItem('upgradeCost'));
+      coinsPerHour = parseFloat(localStorage.getItem('coinsPerHour'));
+      hourlyUpgradeCost = parseFloat(localStorage.getItem('hourlyUpgradeCost'));
+      hourlyIncrement = parseFloat(localStorage.getItem('hourlyIncrement'));
+      document.getElementById('counter').innerText = Math.round(counter);
+      document.getElementById('upgrade-cost').innerText = Math.round(upgradeCost);
+      document.getElementById('hourly-upgrade-cost').innerText = Math.round(hourlyUpgradeCost);
+      updateInfoBoxes();
+    }
+  }
+
+  function getLevel() {
+    for (let level of levels) {
+      if (counter >= level.min && counter <= level.max) {
+        return level.name;
+      }
+    }
+    return "Бронза";
+  }
+
+  function happyBirthday() {
+    alert("С ДР, Миша!");
+  }
+
+  window.onload = () => {
+    loadGame();
+    setInterval(updateCoinsPerHour, 1000);
+  };
 </script>
-<div class="loading-screen" id="loading-screen">
-Загрузка...
-<div class="loading-bar">
-<div class="loading-progress" id="loading-progress"></div>
-</div>
-</div>
-<div class="section">
-<div class="counter" id="counter">0</div>
-</div>
-<div class="section">
-<button class="click-button" onclick="incrementCounter()">
-<img src="click-image.png" style="width: 116px; height: 66px;"></button>
-</div>
-<div class="section">
-<button class="shop-button" onclick="openShop()">
-<img src="shop-image.png" style="width: 87px; height: 50px;"></button>
-</div>
-<div class="section">
-<div class="info-box" id="points-per-click">Монет за клик: 1</div>
-<div class="info-box" id="coins-per-hour">Прибыль в час: 0</div>
-<div class="info-box" id="level">Уровень: Бронза</div>
-</div>
-<div class="shop" id="shop">
-<h2>Магазин</h2>
-<div class="shop-item">
-<button onclick="buyUpgrade()">Купить улучшение (Цена: <span id="upgrade-cost">10</span>)</button>
-</div>
-<div class="shop-item">
-<button onclick="buyHourlyUpgrade()">Увеличить прибыль в час 1 (Цена: <span id="hourly-upgrade-cost">50</span>)</button>
-</div>
-<button class="close-shop" onclick="closeShop()">Закрыть</button>
-</div>
-<div class="notification" id="notification">Недостаточно кликов для покупки улучшения!</div>
-<script src="script.js"></script>
-</body>
-</html>
