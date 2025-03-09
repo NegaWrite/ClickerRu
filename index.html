@@ -239,21 +239,62 @@ style="width:88px; height:31px; border:0;" alt="Яндекс.Метрика" tit
 
 
 <script>
-  // Музыкальный плеер
+<!-- В разделе music-controls замените аудио-теги на: -->
+<div class="music-controls">
+  <div class="music-title" id="music-title">Загрузка музыки...</div>
+  <audio id="background-music" controls>
+    <source src="https://drive.google.com/uc?export=download&id=1NsL48Mik1Qy08tz7132hBO99_QOsDtd7" type="audio/mpeg" data-title="World Smallest Violin">
+    <source src="https://drive.google.com/uc?export=download&id=1B6pz-rduHxzmTAx-d4RF9qdfFrbOQUlI" type="audio/mpeg" data-title="Harder Better Faster Stronger">
+    <source src="https://drive.google.com/uc?export=download&id=1Z5Kd_1b3BT91QHcZE2YURb7pfHA4nFRq" type="audio/mpeg" data-title="А где прошла ты">
+    <source src="https://drive.google.com/uc?export=download&id=1NBra_-aYwIiIPA1L0_yAFL37l8G3A3q1" type="audio/mpeg" data-title="Славный город Кострома">
+    <source src="https://drive.google.com/uc?export=download&id=111ICTEflQ16Jz6lnyTDZHwlcRF-ZO-Y0" type="audio/mpeg" data-title="SPIN IN MY FACE">
+    <source src="https://drive.google.com/uc?export=download&id=1ZwnwaD_AXDfiVSQK9_jwGhI7V4sOzWcf" type="audio/mpeg" data-title="Группа Крови">
+    Ваш браузер не поддерживает элемент audio.
+  </audio>
+  <div class="music-controls-buttons">
+    <button onclick="previousTrack()">⏮</button>
+    <button onclick="togglePlay()">▶/⏸</button>
+    <button onclick="nextTrack()">⏭</button>
+  </div>
+</div>
+
+<script>
   const audioElement = document.getElementById('background-music');
   let currentTrackIndex = 0;
   const tracks = Array.from(audioElement.querySelectorAll('source'));
 
   function updateMusicPlayer() {
-    audioElement.src = tracks[currentTrackIndex].src;
+    const track = tracks[currentTrackIndex];
+    audioElement.src = track.src;
+    audioElement.type = track.type;
+    
     audioElement.load();
-    audioElement.play();
+    
+
+    audioElement.play().catch(error => {
+      console.error('Ошибка воспроизведения:', error);
+      showNotification('Нажмите ▶ для запуска музыки');
+    });
+    
     updateMusicTitle();
   }
 
   function togglePlay() {
-    audioElement.paused ? audioElement.play() : audioElement.pause();
+    if(audioElement.paused) {
+      audioElement.play().catch(error => {
+        showNotification('Разрешите автовоспроизведение в браузере');
+      });
+    } else {
+      audioElement.pause();
+    }
   }
+
+ 
+  audioElement.addEventListener('error', () => {
+    console.error('Ошибка загрузки аудио');
+    showNotification('Ошибка загрузки трека');
+    nextTrack();
+  });
 
   function nextTrack() {
     currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
