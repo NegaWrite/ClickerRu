@@ -220,63 +220,56 @@ style="width:88px; height:31px; border:0;" alt="Яндекс.Метрика" tit
     <button class="close-shop" onclick="closeShop()">Закрыть</button>
   </div>
  <div class="music-controls">
-  <div class="music-title" id="music-title">Музыка 1</div>
-  <audio id="background-music" controls>
-    <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID1" type="audio/mpeg" data-title="Музыка 1">
-    <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID2" type="audio/mpeg" data-title="Музыка 2">
-    <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID3" type="audio/mpeg" data-title="Музыка 3">
-    <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID4" type="audio/mpeg" data-title="Музыка 4">
-    <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID5" type="audio/mpeg" data-title="Музыка 5">
-    <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID6" type="audio/mpeg" data-title="Музыка 6">
-    <source src="https://drive.google.com/uc?export=download&id=YOUR_FILE_ID7" type="audio/mpeg" data-title="Музыка 7">
-    Ваш браузер не поддерживает элемент audio.
-  </audio>
-  <input type="range" id="music-progress" value="0" max="100">
-  <div id="music-time">0:00 / 0:00</div>
-</div>
+    <div class="music-title" id="music-title">Загрузка музыки...</div>
+    <audio id="background-music" controls>
+      <source src="https://cdn.pixabay.com/download/audio/2022/02/22/audio_d1718ab41b.mp3" type="audio/mpeg" data-title="Веселая мелодия">
+      <source src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_7d0d3c7d98.mp3" type="audio/mpeg" data-title="Эпическая музыка">
+      Ваш браузер не поддерживает элемент audio.
+    </audio>
+    <div class="music-controls-buttons">
+      <button onclick="previousTrack()">⏮</button>
+      <button onclick="togglePlay()">▶/⏸</button>
+      <button onclick="nextTrack()">⏭</button>
+    </div>
+  </div>
+
 
 <script>
+  // Музыкальный плеер
   const audioElement = document.getElementById('background-music');
-  const progressBar = document.getElementById('music-progress');
-  const musicTitle = document.getElementById('music-title');
-  const musicTime = document.getElementById('music-time');
+  let currentTrackIndex = 0;
+  const tracks = Array.from(audioElement.querySelectorAll('source'));
 
-  audioElement.addEventListener('loadedmetadata', () => {
-    progressBar.max = audioElement.duration;
-    updateMusicTime();
-  });
+  function updateMusicPlayer() {
+    audioElement.src = tracks[currentTrackIndex].src;
+    audioElement.load();
+    audioElement.play();
+    updateMusicTitle();
+  }
 
+  function togglePlay() {
+    audioElement.paused ? audioElement.play() : audioElement.pause();
+  }
+
+  function nextTrack() {
+    currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+    updateMusicPlayer();
+  }
+
+  function previousTrack() {
+    currentTrackIndex = (currentTrackIndex - 1 + tracks.length) % tracks.length;
+    updateMusicPlayer();
+  }
+
+  audioElement.addEventListener('ended', nextTrack);
+
+  // Исправленный прогресс-бар
   audioElement.addEventListener('timeupdate', () => {
-    progressBar.value = audioElement.currentTime;
-    updateMusicTime();
+    const progress = (audioElement.currentTime / audioElement.duration) * 100;
+    document.getElementById('music-progress').value = progress;
   });
-
-  progressBar.addEventListener('input', () => {
-    audioElement.currentTime = progressBar.value;
-  });
-
-  function updateMusicTime() {
-    const currentTime = formatTime(audioElement.currentTime);
-    const duration = formatTime(audioElement.duration);
-    musicTime.textContent = `${currentTime} / ${duration}`;
-  }
-
-  function formatTime(time) {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60).toString().padStart(2, '0');
-    return `${minutes}:${seconds}`;
-  }
-
-  audioElement.addEventListener('play', updateMusicTitle);
-  audioElement.addEventListener('ended', updateMusicTitle);
-
-  function updateMusicTitle() {
-    const currentSource = audioElement.querySelector('source[src="' + audioElement.currentSrc + '"]');
-    if (currentSource) {
-      musicTitle.textContent = currentSource.getAttribute('data-title');
-    }
-  }
 </script>
+  
   <div class="notification" id="notification">Недостаточно кликов для покупки улучшения!</div>
   <script>
   let counter = 0;
@@ -428,5 +421,8 @@ style="width:88px; height:31px; border:0;" alt="Яндекс.Метрика" tit
   window.onload = () => {
     loadGame();
     setInterval(updateCoinsPerHour, 1000);
+    updateMusicPlayer();
   };
 </script>
+</body>
+</html>
